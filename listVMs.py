@@ -3,43 +3,53 @@ import requests
 import urllib3
 import json
 import getpass
-
 from vmware.vapi.vsphere.client import create_vsphere_client
 
-vCenterHostIP = '192.168.2.4'
-usernameValue = 'administrator@vsphere.local'
-#password = getpass.getpass()
-password = 'Go2atc4labs!'
+def connectToVcenterWithSDK(vCenterHostIP, usernameValue, password): 
+    session = requests.session()
+    session.verify = False
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    vsphere_client = create_vsphere_client(server=vCenterHostIP, username = usernameValue, password = password, session=session)    
+    return vsphere_client
 
-session = requests.session()
-session.verify = False
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-vsphere_client = create_vsphere_client(server=vCenterHostIP, username = usernameValue, password = password, session=session)
+def getESXiHostNames(vsphere_client):
 
-listVMs = vsphere_client.vcenter.VM.list()
-listHosts = vsphere_client.vcenter.Host.list()
+    listHosts = vsphere_client.vcenter.Host.list()
 
-def getESXiHostNames():
     strippedlistESX = []
     listtoStr = ' '.join(map(str, listHosts))
     splitlistHosts = listtoStr.split(", ")
     for i in splitlistHosts:
         if i != None and "name" in i:
-            print(i)
+            i = i.lstrip("name : ")
             strippedlistESX.append(i)
+            #print(i)
     return strippedlistESX
 
-def getVMNames():
-#For loop for multiple hosts 
+def getVMNames(vsphere_client):
+
+    listVMs = vsphere_client.vcenter.VM.list()
+        
     strippedlistVMs = []
     listtoStr = ' '.join(map(str, listVMs))
     splitlistVMs = listtoStr.split(", ")
     for i in splitlistVMs: 
         if i != None and "name" in i:
-            print(i)
+            i = i.lstrip("name : ")
             strippedlistVMs.append(i)
+            #print(i)
     return strippedlistVMs
 
 if __name__ == "__main__":
-    getESXiHostNames()
-    #getVMNames()
+    
+    vCenterHostIP = '192.168.2.4'
+    usernameValue = 'administrator@vsphere.local'
+    password = 'Go2atc4labs!'
+    #password = getpass.getpass()
+    
+    vsphere_client = connectToVcenterWithSDK(vCenterHostIP, usernameValue, password)
+    
+    hostNames = getESXiHostNames(vsphere_client)
+    vmNames = getVMNames(vsphere_client)
+
+    vsphere_client.session.close
