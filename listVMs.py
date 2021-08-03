@@ -4,10 +4,17 @@ import urllib3
 import json
 import getpass
 from vmware.vapi.vsphere.client import create_vsphere_client
+#to add a progress bar if desired
+#from tqdm import tqdm (make sure tqdm is installed 
+# session.verify = self.args.cert_path- pip install tqdm)
+#for i in tqdm(range(1000)): 
+# do for loop
+
 
 def connectToVcenterWithSDK(vCenterHostIP, usernameValue, password): 
     session = requests.session()
     session.verify = False
+    session.trust_env = False
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     vsphere_client = create_vsphere_client(server=vCenterHostIP, username = usernameValue, password = password, session=session)    
     return vsphere_client
