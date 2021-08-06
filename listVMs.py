@@ -3,12 +3,33 @@ import requests
 import urllib3
 import json
 import getpass
-from vmware.vapi.vsphere.client import create_vsphere_client
+import time
+#from vmware.vapi.vsphere.client import create_vsphere_client
 #to add a progress bar if desired
 #from tqdm import tqdm (make sure tqdm is installed 
 # session.verify = self.args.cert_path- pip install tqdm)
 #for i in tqdm(range(1000)): 
 # do for loop
+
+#Try to import the VMware Python SDK, if fail, pip install the python SDK, wait 60 seconds, try again. 
+t = False
+count = 0
+while t == False:
+    try:
+        from vmware.vapi.vsphere.client import create_vsphere_client
+        t = True
+        print('vmware sdk present')
+        break
+    except ImportError as e:
+        if count == 0:
+            print('no vmware sdk present. installing with pip')
+            os.system('pip install --upgrade pip setuptools') # this will excute a cli cmd
+            os.system('pip install --upgrade git+https://github.com/vmware/vsphere-automation-sdk-python.git')
+            time.sleep(60)
+            count += 1
+        else:
+            print('still installing vmware python sdk')
+
 
 
 def connectToVcenterWithSDK(vCenterHostIP, usernameValue, password): 
