@@ -68,6 +68,43 @@ def getVMNames(vsphere_client):
             #print(i)
     return strippedlistVMs
 
+def createCSRConfigFiles(hostNames):
+    path = os.getcwd()
+    try:
+        fileIn = open("openssl_template.cfg", "rt")
+        print("opening the open SSL cfg template file")
+    except Exception as e:
+        print("Can't open openssl_template.cfg file to read, exiting")
+        fileIn.close()
+        exit()
+    
+    for name in hostNames:
+        try:
+            outPath = os.path.join(os.getcwd(),'HostCSR', name)
+            #os.mkdir(outPath)
+            os.makedirs(outPath, exist_ok=True)
+            os.chdir(outPath)
+            fileOut = open(name, "wt")
+            for line in fileIn:
+                if "commonName" in line:
+                    fileOut.write(line.replace('<variable>', name))
+                else:
+                    fileOut.write(line)
+            fileOut.close()
+
+        except Exception as e: 
+            print("directory might already exist, exiting")
+            print(e)
+            exit()
+        
+        os.chdir(path)
+
+    fileIn.close()
+
+
+
+
+
 if __name__ == "__main__":
     
     vCenterHostIP = '192.168.2.4'
@@ -79,5 +116,7 @@ if __name__ == "__main__":
     
     hostNames = getESXiHostNames(vsphere_client)
     vmNames = getVMNames(vsphere_client)
-
     vsphere_client.session.close
+
+    createCSRConfigFiles(hostNames)
+    #createCSRConfigFiles(['esx1', 'esxi2', 'esxi3'])
