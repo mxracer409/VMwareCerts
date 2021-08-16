@@ -75,7 +75,6 @@ def createCSRConfigFiles(hostNames):
         print("opening the open SSL cfg template file")
     except Exception as e:
         print("Can't open openssl_template.cfg file to read, exiting")
-        fileIn.close()
         exit()
     
     for name in hostNames:
@@ -100,9 +99,27 @@ def createCSRConfigFiles(hostNames):
         os.chdir(path)
 
     fileIn.close()
+    return print('generated an openssl cfg file for each host located here: ' + os.getcwd() + '\HostCSR')
 
-
-
+def generateCSRandKeyFiles(hostNames):
+    #hostNames not used right now... can remove from input)
+    parentPath = os.getcwd()
+    path = os.path.join(parentPath, 'HostCSR')
+    os.chdir(path)
+    for folder in os.listdir(os.getcwd()):
+        newPath = os.path.join(path, folder)
+        os.chdir(newPath)
+        openSSLfile = folder
+        #using full path to OpenSSL install location right now C:\"Program Files"\OpenSSL-Win64\bin\openssl
+        try: 
+            openSSLlocation = 'C:\\"Program Files"\\OpenSSL-Win64\\bin\\openssl.exe'
+            openSSLcmdEXEcommand = '{} req -new -nodes -out {}.csr -keyout {}-orig.key -config {}'.format(openSSLlocation, openSSLfile, openSSLfile, openSSLfile)
+            os.system(openSSLcmdEXEcommand)
+            print(".CSR and .Key file successfully created at {}".format(newPath))
+        except Exception as e:
+            print("error in openSSL CSR and Key file creation - more details")
+            print(e)
+            exit()
 
 
 if __name__ == "__main__":
@@ -120,3 +137,5 @@ if __name__ == "__main__":
 
     createCSRConfigFiles(hostNames)
     #createCSRConfigFiles(['esx1', 'esxi2', 'esxi3'])
+
+    generateCSRandKeyFiles(hostNames)
