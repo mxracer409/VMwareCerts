@@ -116,14 +116,26 @@ def generateCSRandKeyFiles(hostNames):
             openSSLcmdEXEcommand = '{} req -new -nodes -out {}.csr -keyout {}-orig.key -config {}'.format(openSSLlocation, openSSLfile, openSSLfile, openSSLfile)
             os.system(openSSLcmdEXEcommand)
             print(".CSR and .Key file successfully created at {}".format(newPath))
+            print("now converting key to RSA")
+            convertToRSA(newPath, openSSLfile, openSSLlocation)
         except Exception as e:
             print("error in openSSL CSR and Key file creation - more details")
             print(e)
             exit()
 
+def convertToRSA(newPath, openSSLfile, openSSLlocation):
+    os.chdir(newPath)
+    try:
+        openSSLcmdEXEconvertCommand = '{} rsa -in {}-orig.key -out {}.key'.format(openSSLlocation, openSSLfile, openSSLfile)
+        os.system(openSSLcmdEXEconvertCommand)
+    except Exception as e:
+        exit()
+
+    return print('original key is converted to RSA for host ' + openSSLfile)
+
 
 if __name__ == "__main__":
-    
+        
     vCenterHostIP = '192.168.2.4'
     usernameValue = 'administrator@vsphere.local'
     password = 'Go2atc4labs!'
