@@ -90,6 +90,7 @@ def createCSRConfigFiles(hostNames):
                 else:
                     fileOut.write(line)
             fileOut.close()
+            fileIn.seek(0,0)
 
         except Exception as e: 
             print("directory might already exist, exiting")
@@ -147,7 +148,7 @@ if __name__ == "__main__":
     vmNames = getVMNames(vsphere_client)
     vsphere_client.session.close
 
-    createCSRConfigFiles(hostNames)
-    #createCSRConfigFiles(['esx1', 'esxi2', 'esxi3'])
+    #createCSRConfigFiles(hostNames)
+    createCSRConfigFiles(['esxi1', 'esxi2', 'esxi3'])
 
-    generateCSRandKeyFiles(hostNames)
+    #generateCSRandKeyFiles(hostNames)
